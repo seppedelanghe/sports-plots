@@ -1,1 +1,1 @@
-from src import FootballPitch
+from src.football import FootballPitch

@@ -1,65 +1,83 @@
 import matplotlib.pyplot as plt
 import numpy as np
+
 from math import pi
+from typing import List, Optional
 
 class FootballPitch:
-    def __init__(self, players = 'red', bg = 'green', lines = 'white', figsize=(12, 7)):
+    def __init__(self, playerscolor = 'red', bg = 'darkgreen', lines = 'white', textcolor = 'black', figsize=(12, 7)):
         self.bg = bg
         self.lines = lines
-        self.players = players
+        self.playerscolor = playerscolor
+        self.textcolor = textcolor
         self.figsize = figsize
         
         self.flipped = False
 
-    def set_fig(self):
+        self.dotsize = 0.005
+        self.default_scattersize = 30
+
+    def _set_fig(self):
         fig, ax = plt.subplots(figsize=self.figsize)
-        fig.patch.set_facecolor(f'xkcd:{self.bg}')
-        ax.set_facecolor(f'xkcd:{self.bg}')
+        fig.patch.set_facecolor(self.bg)
+        ax.set_facecolor(self.bg)
         ax.set_xlim(0, 1)
         ax.set_ylim(0, 1)
 
         self.fig = fig
         self.ax = ax
 
-    def flip(self):
-        self.flipped = not self.flipped
-        self.figsize = (self.figsize[1], self.figsize[0])
-
-    def plot_circles(self):
+    def _plot_circles(self):
         w, h = self.figsize
 
         cx, cy = self.make_pitch_circle(0.5, 0.5, 0.2 * (h / w), 0.2)
-        plt.plot(cx, cy, color=self.lines)
+        plt.plot(cx, cy, color=self.lines, zorder=0)
 
-        cx, cy = self.make_pitch_circle(0.5, 0.5, 0.005 * (h / w), 0.005)
-        plt.fill(cx, cy, color=self.lines)
+        cx, cy = self.make_pitch_circle(0.5, 0.5, self.dotsize * (h / w), self.dotsize)
+        plt.fill(cx, cy, color=self.lines, zorder=0)
         
         pen1 = (0.5, 0.11) if self.flipped else (0.11, 0.5)
-        cx, cy = self.make_pitch_circle(*pen1, 0.005 * (h / w), 0.005)
-        plt.fill(cx, cy, color=self.lines)
+        cx, cy = self.make_pitch_circle(*pen1, self.dotsize * (h / w), self.dotsize)
+        plt.fill(cx, cy, color=self.lines, zorder=0)
 
         pen2 = (0.5, 0.89) if self.flipped else (0.89, 0.5)
-        cx, cy = self.make_pitch_circle(*pen2, 0.005 * (h / w), 0.005)
-        plt.fill(cx, cy, color=self.lines)
+        cx, cy = self.make_pitch_circle(*pen2, self.dotsize * (h / w), self.dotsize)
+        plt.fill(cx, cy, color=self.lines, zorder=0)
 
-    def plot_lines(self):
+    def _plot_pitch_lines(self):
         xdata, ydata = self.make_pitch_lines()
 
         for i in range(0, xdata.shape[0]):
             if self.flipped:
-                line = plt.Line2D(xdata=ydata[i], ydata=xdata[i], linewidth=2, color=self.lines)
+                line = plt.Line2D(xdata=ydata[i], ydata=xdata[i], linewidth=2, color=self.lines, zorder=0)
             else:
-                line = plt.Line2D(xdata=xdata[i], ydata=ydata[i], linewidth=2, color=self.lines)
+                line = plt.Line2D(xdata=xdata[i], ydata=ydata[i], linewidth=2, color=self.lines, zorder=0)
             self.ax.add_line(line)
+            
+    def _plot_names(self, x: np.ndarray, names: List[str]):
+        for i, name in enumerate(names):
+            xspace = self.dotsize * (4 if x.shape[1] == 3 else 2)
+            pos = x[i, :2] + np.array((xspace, -0.01))
+            plt.text(*pos, name, fontsize=12, c=self.textcolor, zorder=1)
+            
+    def flip(self):
+        self.flipped = not self.flipped
+        self.figsize = (self.figsize[1], self.figsize[0])
 
-    def plot(self, x):
-        self.set_fig()
+    def plot(self, x: np.ndarray, names: Optional[List[str]] = None, custom_colors: Optional[list] = None):
+        self._set_fig()
 
-        self.plot_lines()
-        self.plot_circles()
+        self._plot_pitch_lines()
+        self._plot_circles()
+
+        if type(names) != type(None):
+            self._plot_names(x, names)
+        
+        colors = custom_colors if type(custom_colors) != type(None) else self.playerscolor
 
         plt.axis('off')
-        plt.scatter(x[:, 0], x[:, 1], color=self.players)
+        size = x[:, 2] if x.shape[1] == 3 else self.default_scattersize
+        plt.scatter(x[:, 0], x[:, 1], color=colors, zorder=10, s=size)
 
     @staticmethod
     def make_pitch_circle(x: float, y: float, rx: float, ry: float):
@@ -130,4 +148,3 @@ class FootballPitch:
         ])
 
         return x, y
-    
