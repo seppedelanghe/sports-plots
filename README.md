@@ -1,8 +1,25 @@
 # Sport plots
 
-### Football
+## Football
 
-__code example:__
+__Name:__ FootballPitch <br>
+__Options:__
+- Custom colors
+    - Background
+    - Players
+    - Links
+    - Text color
+
+- Plots
+    - Position plot
+    - Link plots
+
+- Output
+    - Matplotlib
+    - Image
+    - Numpy
+
+### example
 ```python
 import numpy as np
 
@@ -41,9 +58,14 @@ fp = FootballPitch(
 # plot
 fp.plot(positions, names, colors)
 
+# show plot
+fp.show()
+
+# save as image
+fp.save('./plot.png')
+
 # convert plot to numpy array
 out = fp.to_numpy()
 ```
-__plot example:__
 
 <img src="./plots/football.png" />

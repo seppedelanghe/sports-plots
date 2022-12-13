@@ -117,6 +117,12 @@ class FootballPitch:
             line = plt.Line2D(xdata=(fx, tx), ydata=(fy, ty), linewidth=s, color=colors[idx], zorder=self.z_links)
             self.ax.add_line(line)
 
+    def show(self):
+        self.fig.show()
+
+    def save(self, path):
+        self.fig.savefig(path)
+
     def to_numpy(self):
         self.fig.canvas.draw()
         data = np.frombuffer(self.fig.canvas.tostring_rgb(), dtype=np.uint8)
