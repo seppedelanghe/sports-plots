@@ -79,6 +79,14 @@ class FootballPitch:
         size = x[:, 2] if x.shape[1] == 3 else self.default_scattersize
         plt.scatter(x[:, 0], x[:, 1], color=colors, zorder=10, s=size)
 
+    def as_numpy(self, x: np.ndarray, names: Optional[List[str]] = None, custom_colors: Optional[list] = None):
+        self.plot(x, names, custom_colors)
+
+        self.fig.canvas.draw()
+        data = np.frombuffer(self.fig.canvas.tostring_rgb(), dtype=np.uint8)
+        data = data.reshape(self.fig.canvas.get_width_height()[::-1] + (3,))
+        return data
+
     @staticmethod
     def make_pitch_circle(x: float, y: float, rx: float, ry: float):
         t = np.linspace(0, 2*pi, 100)
