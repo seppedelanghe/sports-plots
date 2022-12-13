@@ -70,6 +70,9 @@ class FootballPitch:
         self._plot_pitch_lines()
         self._plot_circles()
 
+        if self.flipped:
+            x[:, 0:2] = x[:, 0:2][:, ::-1] # reorder x and y coordinates to match vertical pitch
+
         if type(names) != type(None):
             self._plot_names(x, names)
         
