@@ -59,12 +59,21 @@ class FootballPitch:
             xspace = self.dotsize * (4 if x.shape[1] == 3 else 2)
             pos = x[i, :2] + np.array((xspace, -0.01))
             plt.text(*pos, name, fontsize=12, c=self.textcolor, zorder=1)
-            
+
+    def _validate_input(self, x: np.ndarray):
+        if type(x) != np.ndarray:
+            raise Exception('Input data is not a numpy array.')
+        
+        if x.shape[1] < 2 or x.shape[1] > 3:
+            raise Exception(f'Input data has invalid shape. Last dimension of input array needs to be 2 or 3, not {x.shape[1]}.')
+
     def flip(self):
         self.flipped = not self.flipped
         self.figsize = (self.figsize[1], self.figsize[0])
 
     def plot(self, x: np.ndarray, names: Optional[List[str]] = None, custom_colors: Optional[list] = None):
+        self._validate_input(x)
+        
         self._set_fig()
 
         self._plot_pitch_lines()
