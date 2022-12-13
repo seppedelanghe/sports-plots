@@ -68,4 +68,11 @@ fp.save('./plot.png')
 out = fp.to_numpy()
 ```
 
+# Plots
+
+## Positions
 <img src="./plots/football.png" />
+<br>
+
+## Links
+<img src="./plots/links.png" />
