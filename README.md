@@ -6,61 +6,43 @@ __code example:__
 ```python
 import numpy as np
 
-postions = np.array([
-    (0.02, 0.53),
-    
-    (0.24, 0.15),
-    (0.2, 0.38),
-    (0.2, 0.65),
-    (0.26, 0.85),
-
-    (0.35, 0.5),
-    (0.40, 0.25),
-    (0.40, 0.75),
-    
-    (0.5, 0.50),
-    (0.5, 0.46),
-    (0.5, 0.8),
+# positions in X and Y coordinates between 0 and 1
+positions = np.array([
+    (0.02, 0.53), # GK
+    (0.24, 0.15), (0.2, 0.38), (0.2, 0.65), (0.26, 0.85), # Defenders
+    (0.35, 0.5), (0.40, 0.25), (0.40, 0.75), # Midfielders
+    (0.5, 0.50), (0.5, 0.46), (0.5, 0.8), # Attackers
 ])
 
+# set player names
 names = [
     'Donnarumma',
-
-    'Hakimi',
-    'Kimpembe',
-    'Marquinhos',
-    'Bernat',
-
-    'Verratti',
-    'Sanches',
-    'Vitinha',
-
-    'Messi',
-    'Neymar',
-    'Mbappe'
+    'Hakimi', 'Kimpembe', 'Marquinhos', 'Bernat',
+    'Verratti', 'Sanches', 'Vitinha',
+    'Messi', 'Neymar', 'Mbappe'
 ]
 
+# add custom colors
 colors = [
     'orange',
-
-    'red',
-    'red',
-    'red',
-    'red',
-    
-    'blue',
-    'blue',
-    'blue',
-    
-    '#aa0bff',
-    '#aa0bff',
-    '#aa0bff'
+    'red', 'red', 'red', 'red',
+    'blue', 'blue', 'blue',
+    '#aa0bff', '#aa0bff', '#aa0bff'
 ]
 
 from src import FootballPitch
 
-fp = FootballPitch('red', 'darkgreen', textcolor='white')
-fp.plot(postions, names, colors)
+# init FootballPitch
+fp = FootballPitch(
+    playerscolor='red', 
+    bg='darkgreen', 
+    textcolor='white')
+
+# plot
+fp.plot(positions, names, colors)
+
+# plot to numpy array
+out = fp.as_numpy(postions, names)
 ```
 __plot example:__
 
