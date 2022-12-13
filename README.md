@@ -41,8 +41,8 @@ fp = FootballPitch(
 # plot
 fp.plot(positions, names, colors)
 
-# plot to numpy array
-out = fp.as_numpy(postions, names)
+# convert plot to numpy array
+out = fp.to_numpy()
 ```
 __plot example:__
 

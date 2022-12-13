@@ -5,7 +5,7 @@ from math import pi
 from typing import List, Optional
 
 class FootballPitch:
-    def __init__(self, playerscolor = 'red', bg = 'darkgreen', lines = 'white', textcolor = 'black', figsize=(12, 7)):
+    def __init__(self, playerscolor = 'red', bg = 'darkgreen', lines = 'white', textcolor = 'black', colorpallete: Optional[List[str]] = None, figsize=(12, 7)):
         self.bg = bg
         self.lines = lines
         self.playerscolor = playerscolor
@@ -16,6 +16,11 @@ class FootballPitch:
 
         self.dotsize = 0.005
         self.default_scattersize = 30
+
+        self.z_pitch = 0
+        self.z_links = 1
+        self.z_dots = 2
+        self.z_names = 3
 
     def _set_fig(self):
         fig, ax = plt.subplots(figsize=self.figsize)
@@ -31,34 +36,40 @@ class FootballPitch:
         w, h = self.figsize
 
         cx, cy = self.make_pitch_circle(0.5, 0.5, 0.2 * (h / w), 0.2)
-        plt.plot(cx, cy, color=self.lines, zorder=0)
+        plt.plot(cx, cy, color=self.lines, zorder=self.z_pitch)
 
         cx, cy = self.make_pitch_circle(0.5, 0.5, self.dotsize * (h / w), self.dotsize)
-        plt.fill(cx, cy, color=self.lines, zorder=0)
+        plt.fill(cx, cy, color=self.lines, zorder=self.z_pitch)
         
         pen1 = (0.5, 0.11) if self.flipped else (0.11, 0.5)
         cx, cy = self.make_pitch_circle(*pen1, self.dotsize * (h / w), self.dotsize)
-        plt.fill(cx, cy, color=self.lines, zorder=0)
+        plt.fill(cx, cy, color=self.lines, zorder=self.z_pitch)
 
         pen2 = (0.5, 0.89) if self.flipped else (0.89, 0.5)
         cx, cy = self.make_pitch_circle(*pen2, self.dotsize * (h / w), self.dotsize)
-        plt.fill(cx, cy, color=self.lines, zorder=0)
+        plt.fill(cx, cy, color=self.lines, zorder=self.z_pitch)
 
     def _plot_pitch_lines(self):
         xdata, ydata = self.make_pitch_lines()
 
         for i in range(0, xdata.shape[0]):
             if self.flipped:
-                line = plt.Line2D(xdata=ydata[i], ydata=xdata[i], linewidth=2, color=self.lines, zorder=0)
+                line = plt.Line2D(xdata=ydata[i], ydata=xdata[i], linewidth=2, color=self.lines, zorder=self.z_pitch)
             else:
-                line = plt.Line2D(xdata=xdata[i], ydata=ydata[i], linewidth=2, color=self.lines, zorder=0)
+                line = plt.Line2D(xdata=xdata[i], ydata=ydata[i], linewidth=2, color=self.lines, zorder=self.z_pitch)
             self.ax.add_line(line)
-            
-    def _plot_names(self, x: np.ndarray, names: List[str]):
-        for i, name in enumerate(names):
+
+    def _plot_names(self, x: np.ndarray, names: list):
+        valid = type(names[0]) == str or (type(names[0]) == tuple and type(names[0][0]) == int and type(names[0][1]) == str)
+        if not valid:
+            raise Exception('Names is invalid format. Names parameter needs to be list of strings or list of Tuple[int, str] containing the index of the player and the name.')
+        
+        names = [(i, name) for i, name in enumerate(names)] if type(names[0]) == str else names
+        
+        for i, name in names:
             xspace = self.dotsize * (4 if x.shape[1] == 3 else 2)
             pos = x[i, :2] + np.array((xspace, -0.01))
-            plt.text(*pos, name, fontsize=12, c=self.textcolor, zorder=1)
+            plt.text(*pos, name, fontsize=12, c=self.textcolor, zorder=self.z_names)
 
     def _validate_input(self, x: np.ndarray):
         if type(x) != np.ndarray:
@@ -71,7 +82,7 @@ class FootballPitch:
         self.flipped = not self.flipped
         self.figsize = (self.figsize[1], self.figsize[0])
 
-    def plot(self, x: np.ndarray, names: Optional[List[str]] = None, custom_colors: Optional[list] = None):
+    def plot(self, x: np.ndarray, names: Optional[list] = None, custom_colors: Optional[list] = None):
         self._validate_input(x)
         
         self._set_fig()
@@ -82,18 +93,31 @@ class FootballPitch:
         if self.flipped:
             x[:, 0:2] = x[:, 0:2][:, ::-1] # reorder x and y coordinates to match vertical pitch
 
-        if type(names) != type(None):
+        if type(names) != type(None) and len(names) > 0:
             self._plot_names(x, names)
         
         colors = custom_colors if type(custom_colors) != type(None) else self.playerscolor
 
         plt.axis('off')
         size = x[:, 2] if x.shape[1] == 3 else self.default_scattersize
-        plt.scatter(x[:, 0], x[:, 1], color=colors, zorder=10, s=size)
+        plt.scatter(x[:, 0], x[:, 1], color=colors, zorder=self.z_dots, s=size)
 
-    def as_numpy(self, x: np.ndarray, names: Optional[List[str]] = None, custom_colors: Optional[list] = None):
-        self.plot(x, names, custom_colors)
 
+    def plot_links(self, pos, links,
+            names: Optional[List[str]] = None,
+            custom_player_colors: Optional[List[str]] = None,
+            custom_link_colors: Optional[List[str]] = None):
+        self.plot(pos, names, custom_player_colors)
+
+        colors = custom_link_colors if type(custom_link_colors) != type(None) else ['white' for _ in range(links.shape[0])]
+
+        for idx, (f, t, s) in enumerate(links):
+            fx, fy = pos[f, :2]
+            tx, ty = pos[t, :2]
+            line = plt.Line2D(xdata=(fx, tx), ydata=(fy, ty), linewidth=s, color=colors[idx], zorder=self.z_links)
+            self.ax.add_line(line)
+
+    def to_numpy(self):
         self.fig.canvas.draw()
         data = np.frombuffer(self.fig.canvas.tostring_rgb(), dtype=np.uint8)
         data = data.reshape(self.fig.canvas.get_width_height()[::-1] + (3,))
