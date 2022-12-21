@@ -102,6 +102,8 @@ class FootballPitch:
         size = x[:, 2] if x.shape[1] == 3 else self.default_scattersize
         plt.scatter(x[:, 0], x[:, 1], color=colors, zorder=self.z_dots, s=size)
 
+    def close(self):
+        plt.close(self.fig)
 
     def plot_links(self, pos, links,
             names: Optional[List[str]] = None,
