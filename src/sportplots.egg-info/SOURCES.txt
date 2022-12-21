@@ -1,9 +1,0 @@
-LICENSE
-README.md
-setup.py
-src/sportplots.egg-info/PKG-INFO
-src/sportplots.egg-info/SOURCES.txt
-src/sportplots.egg-info/dependency_links.txt
-src/sportplots.egg-info/top_level.txt
-src/sportsplots/__init__.py
-src/sportsplots/football.py
