@@ -1,1 +1,1 @@
-from src.football import FootballPitch
+from src.sportsplots.football import FootballPitch
