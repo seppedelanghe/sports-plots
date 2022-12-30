@@ -1,5 +1,11 @@
 # Sport plots
 
+## Installation
+
+__Requires Python >=3.6.1__
+
+`pip install git+https://github.com/seppedelanghe/sports-plots.git`
+
 ## Football
 
 __Name:__ FootballPitch <br>
@@ -13,6 +19,9 @@ __Options:__
 - Plots
     - Position plot
     - Link plots
+
+- Plot options:
+    - Custom dot size
 
 - Output
     - Matplotlib
@@ -31,7 +40,7 @@ positions = np.array([
     (0.5, 0.50), (0.5, 0.46), (0.5, 0.8), # Attackers
 ])
 
-# set player names
+# set player names (optional)
 names = [
     'Donnarumma',
     'Hakimi', 'Kimpembe', 'Marquinhos', 'Bernat',
@@ -39,7 +48,7 @@ names = [
     'Messi', 'Neymar', 'Mbappe'
 ]
 
-# add custom colors
+# add custom colors (optional)
 colors = [
     'orange',
     'red', 'red', 'red', 'red',
@@ -64,15 +73,20 @@ fp.show()
 # save as image
 fp.save('./plot.png')
 
-# convert plot to numpy array
+# convert plot to numpy array image (RGB)
 out = fp.to_numpy()
+
+# Close matplotlib figure
+fp.close()
 ```
 
 # Plots
 
-## Positions
+## Positions 
+__This is the output of the example code:__
 <img src="./plots/football.png" />
 <br>
 
 ## Links
+__plot links between players with custom dotsize and link colors:__
 <img src="./plots/links.png" />
