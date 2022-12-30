@@ -4,13 +4,16 @@ import numpy as np
 from math import pi
 from typing import List, Optional
 
-class FootballPitch:
-    def __init__(self, playerscolor = 'red', bg = 'darkgreen', lines = 'white', textcolor = 'black', colorpallete: Optional[List[str]] = None, figsize=(12, 7)):
+from sportsplots.base import BasePlot
+
+class FootballPitch(BasePlot):
+    def __init__(self, playerscolor = 'red', bg = 'darkgreen', lines = 'white', textcolor = 'black', figsize=(12, 7)):
+        super().__init__(figsize=figsize)
+
         self.bg = bg
         self.lines = lines
         self.playerscolor = playerscolor
         self.textcolor = textcolor
-        self.figsize = figsize
         
         self.flipped = False
 
@@ -21,21 +24,6 @@ class FootballPitch:
         self.z_links = 1
         self.z_dots = 2
         self.z_names = 3
-
-        self.scale = (0, 1.0)
-
-    def _normalize(self, x: np.ndarray):
-        return (x - self.scale[0]) / (self.scale[1] - self.scale[0])
-
-    def _set_fig(self):
-        fig, ax = plt.subplots(figsize=self.figsize)
-        fig.patch.set_facecolor(self.bg)
-        ax.set_facecolor(self.bg)
-        ax.set_xlim(0, 1)
-        ax.set_ylim(0, 1)
-
-        self.fig = fig
-        self.ax = ax
 
     def _plot_circles(self):
         w, h = self.figsize
@@ -111,9 +99,6 @@ class FootballPitch:
         size = x[:, 2] if x.shape[1] == 3 else self.default_scattersize
         plt.scatter(x[:, 0], x[:, 1], color=colors, zorder=self.z_dots, s=size)
 
-    def close(self):
-        plt.close(self.fig)
-
     def plot_links(self, pos, links,
             names: Optional[List[str]] = None,
             custom_player_colors: Optional[List[str]] = None,
@@ -130,18 +115,6 @@ class FootballPitch:
             tx, ty = pos[t, :2]
             line = plt.Line2D(xdata=(fx, tx), ydata=(fy, ty), linewidth=s, color=colors[idx], zorder=self.z_links)
             self.ax.add_line(line)
-
-    def show(self):
-        self.fig.show()
-
-    def save(self, path):
-        self.fig.savefig(path)
-
-    def to_numpy(self):
-        self.fig.canvas.draw()
-        data = np.frombuffer(self.fig.canvas.tostring_rgb(), dtype=np.uint8)
-        data = data.reshape(self.fig.canvas.get_width_height()[::-1] + (3,))
-        return data
 
     @staticmethod
     def make_pitch_circle(x: float, y: float, rx: float, ry: float):
