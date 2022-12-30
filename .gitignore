@@ -2,4 +2,6 @@
 __pycache__
 
 dist/
-src/sportplots.egg-info
+sportsplots.egg-info
+
+build

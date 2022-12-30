@@ -22,6 +22,11 @@ class FootballPitch:
         self.z_dots = 2
         self.z_names = 3
 
+        self.scale = (0, 1.0)
+
+    def _normalize(self, x: np.ndarray):
+        return (x - self.scale[0]) / (self.scale[1] - self.scale[0])
+
     def _set_fig(self):
         fig, ax = plt.subplots(figsize=self.figsize)
         fig.patch.set_facecolor(self.bg)
@@ -66,6 +71,8 @@ class FootballPitch:
         
         names = [(i, name) for i, name in enumerate(names)] if type(names[0]) == str else names
         
+        x[:, 0:2] = self._normalize(x[:, 0:2])
+
         for i, name in names:
             xspace = self.dotsize * (4 if x.shape[1] == 3 else 2)
             pos = x[i, :2] + np.array((xspace, -0.01))
@@ -89,6 +96,8 @@ class FootballPitch:
 
         self._plot_pitch_lines()
         self._plot_circles()
+
+        x[:, 0:2] = self._normalize(x[:, 0:2])
 
         if self.flipped:
             x[:, 0:2] = x[:, 0:2][:, ::-1] # reorder x and y coordinates to match vertical pitch
@@ -114,6 +123,9 @@ class FootballPitch:
         colors = custom_link_colors if type(custom_link_colors) != type(None) else ['white' for _ in range(links.shape[0])]
 
         for idx, (f, t, s) in enumerate(links):
+            pos[f, :2] = self._normalize(pos[f, :2])
+            pos[t, :2] = self._normalize(pos[t, :2])
+            
             fx, fy = pos[f, :2]
             tx, ty = pos[t, :2]
             line = plt.Line2D(xdata=(fx, tx), ydata=(fy, ty), linewidth=s, color=colors[idx], zorder=self.z_links)
