@@ -14,7 +14,7 @@ class BasePlot:
         fig.patch.set_facecolor(self.bg)
         ax.set_facecolor(self.bg)
         ax.set_xlim(0, 1)
-        ax.set_ylim(0, 1)
+        ax.set_ylim(1, 0) # 1, 0 to make y go from top to bottom
 
         self.fig = fig
         self.ax = ax
